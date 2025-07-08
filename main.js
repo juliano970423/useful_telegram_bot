@@ -1,4 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
+const express = require('express');
+
+const app = express();
 
 const token =  process.env.TELEGRAM_BOT_TOKEN;
 
@@ -10,6 +13,11 @@ const webhookPath = `/bot${token}`;
 const webhookUrl = `${process.env.RENDER_EXTERNAL_URL}${webhookPath}`;
 
 bot.setWebHook(webhookUrl);
+
+app.post(webhookPath, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
 // Matches "/echo [whatever]"
 bot.onText(/\/echo (.+)/, (msg, match) => {
@@ -31,4 +39,10 @@ bot.on('message', (msg) => {
 
   // send a message to the chat acknowledging receipt of their message
   bot.sendMessage(chatId, 'Received your message');
+});
+
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Bot 已啟動於 port ${PORT}`);
 });
