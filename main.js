@@ -43,6 +43,7 @@ bot.on('message', (msg) => {
 
 
 const PORT = process.env.PORT || 3000;
+app.use(express.json());
 app.listen(PORT, () => {
   console.log(`🚀 Bot 已啟動於 port ${PORT}`);
 });
