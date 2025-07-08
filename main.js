@@ -3,6 +3,7 @@ const express = require('express');
 
 const app = express();
 
+app.use(express.json());
 const token =  process.env.TELEGRAM_BOT_TOKEN;
 
 // Create a bot that uses 'polling' to fetch new updates
@@ -43,7 +44,6 @@ bot.on('message', (msg) => {
 
 
 const PORT = process.env.PORT || 3000;
-app.use(express.json());
 app.listen(PORT, () => {
   console.log(`🚀 Bot 已啟動於 port ${PORT}`);
 });
