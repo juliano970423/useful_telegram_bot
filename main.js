@@ -1,6 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 
+const { calc } = require('./calc');
+
 const app = express();
 
 app.use(express.json());
@@ -21,6 +23,19 @@ app.post(webhookPath, (req, res) => {
 });
 
 // Matches "/echo [whatever]"
+bot.onText(/\/calc (.+)/, (msg, match) => {
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+
+  const chatId = msg.chat.id;
+  const expr = match[1]; // the captured "whatever"
+  const resp = calc(expr);
+
+  // send back the matched "whatever" to the chat
+  bot.sendMessage(chatId, resp);
+});
+// Matches "/echo [whatever]"
 bot.onText(/\/echo (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
@@ -32,15 +47,14 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, resp);
 });
-
 // Listen for any kind of message. There are different kinds of
 // messages.
-bot.on('message', (msg) => {
-  const chatId = msg.chat.id;
-
-  // send a message to the chat acknowledging receipt of their message
-  bot.sendMessage(chatId, 'Received your message');
-});
+//bot.on('message', (msg) => {
+//  const chatId = msg.chat.id;
+//
+//  // send a message to the chat acknowledging receipt of their message
+//  bot.sendMessage(chatId, 'Received your message');
+//});
 
 
 const PORT = process.env.PORT || 3000;
