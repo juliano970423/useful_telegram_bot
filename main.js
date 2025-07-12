@@ -30,10 +30,12 @@ bot.onText(/\/calc (.+)/, (msg, match) => {
 
   const chatId = msg.chat.id;
   const expr = match[1]; // the captured "whatever"
-  const resp = calc(expr);
-
-  // send back the matched "whatever" to the chat
-  bot.sendMessage(chatId, resp);
+  try {
+    const result = calc.calc(expr);
+    bot.sendMessage(chatId, `✅ Result: ${result}`);
+  } catch (e) {
+    bot.sendMessage(chatId, `❌ Error: ${e.message}`);
+  }
 });
 // Matches "/echo [whatever]"
 bot.onText(/\/echo (.+)/, (msg, match) => {
