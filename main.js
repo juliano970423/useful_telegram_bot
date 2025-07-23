@@ -4,6 +4,7 @@ const express = require('express');
 const { calc } = require('./calc');
 
 const app = express();
+const homo = require('./homo');
 
 app.use(express.json());
 const token = process.env.TELEGRAM_BOT_TOKEN;
