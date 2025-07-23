@@ -6,7 +6,7 @@ const { calc } = require('./calc');
 const app = express();
 
 app.use(express.json());
-const token =  process.env.TELEGRAM_BOT_TOKEN;
+const token = process.env.TELEGRAM_BOT_TOKEN;
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: false });
@@ -49,6 +49,24 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, resp);
 });
+
+// Matches "/homo [whatever]"
+bot.onText(/\/homo (.+)/, (msg, match) => {
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+
+  const chatId = msg.chat.id;
+  if (Number(match[1]) == NaN) {
+    bot.sendMessage(chatId, "輸入錯誤");
+  }
+  const number = match[1];
+  const resp = homo(number);
+
+  // send back the matched "whatever" to the chat
+  bot.sendMessage(chatId, resp);
+});
+
 // Listen for any kind of message. There are different kinds of
 // messages.
 //bot.on('message', (msg) => {
