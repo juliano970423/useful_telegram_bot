@@ -58,10 +58,11 @@ bot.onText(/\/homo (.+)/, (msg, match) => {
   // of the message
 
   const chatId = msg.chat.id;
-  if (Number(match[1]) == NaN) {
+  const number = Number(match[1]);
+  if (isNaN(number)) {
     bot.sendMessage(chatId, "輸入錯誤");
+    return;
   }
-  const number = match[1];
   const resp = homo(number);
 
   // send back the matched "whatever" to the chat
