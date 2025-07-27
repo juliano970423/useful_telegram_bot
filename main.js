@@ -62,6 +62,7 @@ bot.onText(/\/help(?: (.+))?/, (msg, match) => {
 /ytdlp <类型> <URL> - 使用yt-dlp下載影片或音樂
 `
     bot.sendMessage(chatId, basicHelpMessage);
+    return;
   }
   const commandDescriptions = {
     'calc': '🔢 計算數學表達式\n用法: /calc <表達式>\n例如: /calc 2+3*4\n可參閱：https://mathjs.org/docs/reference/functions.html',
@@ -71,7 +72,7 @@ bot.onText(/\/help(?: (.+))?/, (msg, match) => {
     'help': 'ℹ️ 顯示幫助訊息\n用法: /help [命令]\n例如: /help calc 或 /help'
   };
   const helpTopic = match[1];
-  bot.sendMessage(msg.chat.id, helpTexts[helpTopic] || '沒有該命令的幫助');
+  bot.sendMessage(msg.chat.id, commandDescriptions[helpTopic] || '沒有該命令的幫助');
 
 });
 
