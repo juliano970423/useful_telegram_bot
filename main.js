@@ -5,9 +5,10 @@ const express = require('express');
 
 const { calc } = require('./calc');
 const { deleteFromS3, getExpiredFiles, removeRecords } = require('./upload_files');
-const {ytdlp}  = require('./yt-dlp');
+const { ytdlp } = require('./yt-dlp');
 const app = express();
 const homo = require('./homo');
+const { help } = require('mathjs');
 
 app.use(express.json());
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -30,6 +31,7 @@ app.get('/delete', async (req, res) => {
   try {
     const expiredFiles = getExpiredFiles();
     if (expiredFiles.length === 0) {
+      console.log('✅ 没有过期的文件需要删除。');
       return res.send('✅ 没有过期的文件需要删除。');
     }
 
@@ -40,10 +42,37 @@ app.get('/delete', async (req, res) => {
 
     removeRecords(expiredFiles); // 清理记录
     res.send(`✅ 成功删除 ${expiredFiles.length} 个过期文件。`);
+    console.log(`✅ 成功删除 ${expiredFiles.length} 个过期文件。`);
   } catch (err) {
     console.error('❌ 删除失败:', err);
     res.status(500).send(`❌ 删除过程中发生错误: ${err.message}`);
   }
+});
+//help
+bot.onText(/\/help(?: (.+))?/, (msg, match) => {
+  const chatId = msg.chat.id;
+  if (match[1] == undefined) {
+    const basicHelpMessage = `
+可用命令:
+/help - 顯示此幫助訊息
+/help <命令> - 顯示特定命令的幫助
+/calc <表達式> - 計算數學表達式
+/echo <文字> - 回傳文字
+/homo <数字> - 惡臭數字論證器
+/ytdlp <类型> <URL> - 使用yt-dlp下載影片或音樂
+`
+    bot.sendMessage(chatId, basicHelpMessage);
+  }
+  const commandDescriptions = {
+    'calc': '🔢 計算數學表達式\n用法: /calc <表達式>\n例如: /calc 2+3*4\n可參閱：https://mathjs.org/docs/reference/functions.html',
+    'echo': '🗣️ 回傳\n用法: /echo <文字>\n例如: /echo 你好世界',
+    'homo': '🔢 計算一個數如何使用惡臭數字表示\n用法: /homo <数字>\n例如: /homo 5',
+    'ytdlp': '📥 影片或音訊下載\n用法: /ytdlp <类型> <URL>\n类型: video 或 audio\n例如: /ytdlp audio https://youtube.com/watch?v=xxxx',
+    'help': 'ℹ️ 顯示幫助訊息\n用法: /help [命令]\n例如: /help calc 或 /help'
+  };
+  const helpTopic = match[1];
+  bot.sendMessage(msg.chat.id, helpTexts[helpTopic] || '沒有該命令的幫助');
+
 });
 
 // Matches "/echo [whatever]"
@@ -56,9 +85,9 @@ bot.onText(/\/calc (.+)/, (msg, match) => {
   const expr = match[1]; // the captured "whatever"
   try {
     const result = calc(expr);
-    bot.sendMessage(chatId, `✅ Result: ${result}`);
+    bot.sendMessage(chatId, `✅ 結果： ${result}`);
   } catch (e) {
-    bot.sendMessage(chatId, `❌ Error: ${e.message}`);
+    bot.sendMessage(chatId, `❌ 錯誤： ${e.message}`);
   }
 });
 // Matches "/echo [whatever]"
@@ -98,14 +127,14 @@ bot.onText(/\/ytdlp (\w+) (.+)/, async (msg, match) => {
   const url = match[2]; // 视频地址
 
   if (!['video', 'audio'].includes(type)) {
-    return bot.sendMessage(chatId, '❌ 类型错误，请使用 "video" 或 "audio"');
+    return bot.sendMessage(chatId, '❌ 類型錯誤，請使用 "video" 或 "audio"');
   }
 
   try {
-    bot.sendMessage(chatId, `⏳ 正在下载 ${type}，请稍等...`);
+    bot.sendMessage(chatId, `⏳ 正在下載 ${type}，請稍等...`);
 
     const downloadUrl = await ytdlp(url, type);
-    bot.sendMessage(chatId, `✅ 下载完成！\n🔗 下载地址: ${downloadUrl}`);
+    bot.sendMessage(chatId, `✅ 下載完成！\n🔗 下载地址: ${downloadUrl}`);
   } catch (err) {
     console.error(`❌ 下载失败: ${err.message}`);
     bot.sendMessage(chatId, `❌ 下载失败: ${err.message}`);
